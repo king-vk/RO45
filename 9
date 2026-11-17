@@ -1,0 +1,31 @@
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score
+
+# Save/read sample CSV-style dataset
+data = pd.DataFrame({
+    'Height': [5.1, 5.5, 5.0, 5.4, 6.2, 6.0, 6.3, 5.9, 6.4],
+    'Weight': [50, 55, 48, 70, 68, 72, 65, 73, 80],
+    'Class': ['A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B']
+})
+
+data.to_csv("sample_bayes.csv", index=False)
+
+df = pd.read_csv("sample_bayes.csv")
+
+X = df[['Height', 'Weight']]
+y = df['Class']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+model = GaussianNB()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("Predicted classes:", list(pred))
+print("Actual classes:", list(y_test))
+print("Accuracy:", round(accuracy_score(y_test, pred), 2))
