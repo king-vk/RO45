@@ -1,0 +1,46 @@
+
+from collections import deque
+
+def successors(state, a, b):
+    x, y = state
+    return [
+        ((a, y), "Fill Jug A"),
+        ((x, b), "Fill Jug B"),
+        ((0, y), "Empty Jug A"),
+        ((x, 0), "Empty Jug B"),
+        ((x - min(x, b-y), y + min(x, b-y)), "Pour A -> B"),
+        ((x + min(y, a-x), y - min(y, a-x)), "Pour B -> A")
+    ]
+
+def dfs_water_jug(a, b, target):
+    stack = [((0, 0), [((0, 0), "Start")])]
+    visited = set()
+
+    while stack:
+        state, path = stack.pop()
+        if state in visited:
+            continue
+        visited.add(state)
+
+        if state[0] == target or state[1] == target:
+            return path
+
+        for nxt, action in reversed(successors(state, a, b)):
+            if nxt not in visited:
+                stack.append((nxt, path + [(nxt, action)]))
+
+    return None
+
+
+a = int(input("Enter capacity of Jug A: "))
+b = int(input("Enter capacity of Jug B: "))
+target = int(input("Enter target amount: "))
+
+path = dfs_water_jug(a, b, target)
+
+if path:
+    print("\nDFS Solution Path:")
+    for state, action in path:
+        print(f"{action:12s} -> {state}")
+else:
+    print("No solution exists.")
