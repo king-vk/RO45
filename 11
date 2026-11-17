@@ -1,0 +1,32 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def locally_weighted_regression(x_train, y_train, x_query, tau=0.4):
+    X = np.c_[np.ones(len(x_train)), x_train]
+    xq = np.array([1.0, x_query])
+
+    weights = np.exp(-((x_train - x_query) ** 2) / (2 * tau ** 2))
+    W = np.diag(weights)
+
+    theta = np.linalg.pinv(X.T @ W @ X) @ (X.T @ W @ y_train)
+    return xq @ theta
+
+
+x = np.linspace(0, 10, 30)
+y = np.sin(x) + 0.3 * np.random.default_rng(1).normal(size=len(x))
+
+query = np.linspace(0, 10, 200)
+pred = [locally_weighted_regression(x, y, s, tau=0.5) for s in query]
+
+print("Number of training points:", len(x))
+print("Bandwidth (tau):", 0.5)
+print("Prediction at x=5:", round(locally_weighted_regression(x, y, 5, tau=0.5), 4))
+
+plt.scatter(x, y, label="Data")
+plt.plot(query, pred, label="LWR")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.title("Locally Weighted Regression")
+plt.legend()
+plt.show()
