@@ -1,0 +1,51 @@
+
+import heapq
+
+def safe(m, c, total_m, total_c):
+    if not (0 <= m <= total_m and 0 <= c <= total_c):
+        return False
+    mr, cr = total_m - m, total_c - c
+    return (m == 0 or m >= c) and (mr == 0 or mr >= cr)
+
+
+def best_first(total_m, total_c):
+    start = (total_m, total_c, 0)  # 0 = left, 1 = right
+    goal = (0, 0, 1)
+    moves = [(1,0),(2,0),(0,1),(0,2),(1,1)]
+    pq = [(total_m + total_c, start, [start])]
+    visited = set()
+
+    while pq:
+        h, state, path = heapq.heappop(pq)
+        if state in visited:
+            continue
+        visited.add(state)
+
+        if state == goal:
+            return path
+
+        m, c, boat = state
+        for dm, dc in moves:
+            if boat == 0:
+                nm, nc, nb = m-dm, c-dc, 1
+            else:
+                nm, nc, nb = m+dm, c+dc, 0
+
+            if safe(nm, nc, total_m, total_c):
+                nxt = (nm, nc, nb)
+                if nxt not in visited:
+                    heapq.heappush(pq, (nm+nc, nxt, path+[nxt]))
+    return None
+
+
+m = int(input("Enter number of missionaries: "))
+c = int(input("Enter number of cannibals: "))
+
+path = best_first(m, c)
+if path:
+    print("\nBest First Search Path:")
+    for s in path:
+        side = "Left" if s[2] == 0 else "Right"
+        print(f"Missionaries={s[0]}, Cannibals={s[1]}, Boat={side}")
+else:
+    print("No solution found.")
