@@ -1,0 +1,37 @@
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+from sklearn.metrics import silhouette_score
+
+X, _ = make_blobs(
+    n_samples=300, centers=3, cluster_std=1.0, random_state=42
+)
+
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+km_labels = kmeans.fit_predict(X)
+
+gmm = GaussianMixture(n_components=3, random_state=42)
+gmm_labels = gmm.fit_predict(X)
+
+print("K-Means silhouette score:",
+      round(silhouette_score(X, km_labels), 4))
+print("EM/GMM silhouette score:",
+      round(silhouette_score(X, gmm_labels), 4))
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+
+ax[0].scatter(X[:, 0], X[:, 1], c=km_labels)
+ax[0].set_title("K-Means Clustering")
+ax[0].set_xlabel("Feature 1")
+ax[0].set_ylabel("Feature 2")
+
+ax[1].scatter(X[:, 0], X[:, 1], c=gmm_labels)
+ax[1].set_title("EM / Gaussian Mixture")
+ax[1].set_xlabel("Feature 1")
+ax[1].set_ylabel("Feature 2")
+
+plt.tight_layout()
+plt.show()
